@@ -140,6 +140,7 @@ ART.SVG.Base = new Class({
 		this.container = container;
 		this._injectGradient('fill');
 		this._injectGradient('stroke');
+		this._injectFilter();
 		this.parent(container);
 		return this;
 	},
@@ -149,6 +150,7 @@ ART.SVG.Base = new Class({
 			this.parent();
 			this._ejectGradient('fill');
 			this._ejectGradient('stroke');
+			this._ejectFilter();
 			this.container = null;
 		}
 		return this;
@@ -200,8 +202,8 @@ ART.SVG.Base = new Class({
 	},
 	
 	_setColor: function(type, color){
-		this[type + 'Gradient'] = null;
 		this._ejectGradient(type);
+		this[type + 'Gradient'] = null;
 		var element = this.element;
 		if (color == null){
 			element.setAttribute(type, 'none');
@@ -263,7 +265,49 @@ ART.SVG.Base = new Class({
 
 		this._setColor('stroke', color);
 		return this;
+	},
+
+	_injectFilter: function(type){
+		if (!this.container) return;
+		var filter = this.filter;
+		if (filter) this.container.defs.appendChild(filter);
+	},
+	
+	_ejectFilter: function(type){
+		if (!this.container) return;
+		var filter = this.filter;
+		if (filter) this.container.defs.removeChild(filter);
+	},
+	
+	/* styles */
+	
+	_createFilter: function(){
+		this._ejectFilter();
+
+		var filter = this.filter = createElement('filter');
+
+		var id = 'filter-e' + this.uid;
+		filter.setAttribute('id', id);
+
+		this._injectFilter();
+
+		this.element.setAttribute('filter', 'url(#' + id + ')');
+
+		return filter;
+	},
+
+	blur: function(radius){
+		if (radius == null) radius = 4;
+		var filter = this._createFilter();
+		var blur = createElement('feGaussianBlur');
+		blur.setAttribute('stdDeviation', radius);
+		blur.setAttribute('result', 'blur');
+		filter.appendChild(blur);
+		//in=SourceGraphic
+		//stdDeviation="4" result="blur"
+		return this;
 	}
+
 	
 });
 

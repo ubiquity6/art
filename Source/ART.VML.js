@@ -363,6 +363,13 @@ ART.VML.Base = new Class({
 
 		this._setColor('stroke', color);
 		return this;
+	},
+	
+	blur: function(radius){
+		if (radius == null) radius = 4;
+		var scale = this.transform.scale[0];
+		this.element.style.filter = 'progid:DXImageTransform.Microsoft.Blur(pixelradius=' + (radius * scale * 2) + ')';
+		return this;
 	}
 
 });
