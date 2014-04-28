@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    Inject
+    Copyright 2011 Jakob Heuser
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an "AS
+    IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+    express or implied.   See the License for the specific language
+    governing permissions and limitations under the License.
+  -->
+  <!--[if lte IE 7]>
+    <script src="/ie-localstorage-json-shim.js" type="text/javascript" id="ie-localstorage-shim"></script>
+  <![endif]-->
+  <script type="text/javascript" src="/inject.js"></script>
+</head>
+<body>
+<h1>Pointcuts</h1>
+<p>Items that haven't been properly externalized can still be captured. In this example, jQuery is loaded using the pointcuts in
+"view source". The "after" cut captures the results of jQuery.noConflict() and stores it as the module.exports. This makes $ available
+just like a developer would expect within their modules.</p>
+
+<p><a href="index.html">Back to examples</a></p>
+
+<p id="output-jq"></p>
+<button id="clearit">Clear Cache</button>
+
+<script type="text/javascript">
+document.getElementById("clearit").onclick = function() {
+  require.clearCache();
+};
+
+require.setModuleRoot("/examples/deps");
+
+require.manifest({
+  "jQuery": {
+    path: "./jquery-1.6.4.min.js",
+    after: function() {
+      module.exports = jQuery.noConflict();
+    }
+  }
+});
+
+require.ensure(["foo", "jQuery"], function(require) {
+  var foo = require("foo"),
+      $ = require("jQuery");
+  
+  $("#output-jq").html(foo.sampleString);
+});
+</script>
+</body>
+</html>
